@@ -1,0 +1,97 @@
+{
+  "name": "Cypress Agent - Basic Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "/cypress-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Cypress Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "cypress-agent"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/webhook/cypress-agent",
+        "authentication": "none",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "jsonBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "githubUrl",
+              "value": "={{ $json.githubUrl }}"
+            },
+            {
+              "name": "projectName",
+              "value": "={{ $json.projectName || \"Proyecto n8n\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-request",
+      "name": "Call Cypress Agent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "respond-to-webhook",
+      "name": "Return Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call Cypress Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Return Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
